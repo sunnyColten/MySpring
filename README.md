@@ -21,5 +21,5 @@
 
 ### 类图
 以下是主要的类图，并不包含全部
-![1559824632099](https://github.com/sunnyColten/MySpring/blob/master/images/%E4%B8%BB%E7%B1%BB%E5%9B%BE.png)
+![1559824632099](https://github.com/sunnyColten/MySpringIOC/blob/master/image/main.png)
 
