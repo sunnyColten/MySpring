@@ -76,16 +76,14 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 			}	
 		}
 	}
+	
 	protected void populateBean(BeanDefinition bd, Object bean){
 		List<PropertyValue> pvs = bd.getPropertyValues();
 		
 		if (pvs == null || pvs.isEmpty()) {
 			return;
 		}
-		
 		BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
-		//类型转换器
-		SimpleTypeConverter converter = new SimpleTypeConverter(); 
 		try{
 			for (PropertyValue pv : pvs){
 				String propertyName = pv.getName();
@@ -93,20 +91,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry
 				Object originalValue = pv.getValue();
 				//将RuntimeBeanReference解析成bean  将TypedStringValue解析成值返回
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(originalValue);
-					
-				//java.beans.Introspector
-				BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
-				PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-								
-				for (PropertyDescriptor pd : pds) {
-					//判断<property name="xxx" ref="yyy"/>中的xxx是否是bean中的某个属性
-					if(pd.getName().equals(propertyName)){
-						//进行类型转换
-						Object convertedValue = converter.convertIfNecessary(resolvedValue, pd.getPropertyType());
-						pd.getWriteMethod().invoke(bean, convertedValue);
-						break;
-					}
-				}				
+				//使用BeanUtils工具类注入属性值
+				BeanUtils.setProperty(bean, propertyName, resolvedValue);
 			}
 		}catch(Exception ex){
 			throw new BeanCreationException("Failed to obtain BeanInfo for class [" + bd.getBeanClassName() + "]", ex);
